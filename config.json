@@ -1,0 +1,12 @@
+{
+  "modelle": ["W211", "E90", "E46"],
+  "quellen": ["kleinanzeigen", "autoscout24"],
+  "preis_min": 500,
+  "preis_max": 5000,
+  "max_reparatur": 2000,
+  "max_km": 350000,
+  "seiten_pro_suche": 2,
+  "details_laden_pro_modell": 15,
+  "treffer_pro_modell": 10,
+  "pause_sekunden": 2.0
+}
