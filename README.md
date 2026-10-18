@@ -37,6 +37,18 @@ python suche.py web                   # Übersicht im Browser, Autos per ♥ mer
 Nach jeder Suche liegt außerdem `bericht.html` im Ordner (ohne ♥-Funktion, dafür
 `python suche.py web` nehmen). Neue Anzeigen seit der letzten Suche sind mit 🆕 markiert.
 
+## Auf dem Handy ansehen
+
+Das Skript läuft auf deinem Computer, das Handy zeigt nur die Übersicht an:
+
+1. Am Computer: `python suche.py` (Suche) und dann `python suche.py web --handy`
+2. Es erscheint eine Adresse wie `http://192.168.178.23:8765`
+3. Handy ins **gleiche WLAN** wie der Computer, die Adresse im Browser eingeben
+4. Dort kannst du Autos per ♥ merken. Tipp: im Browser „Zum Startbildschirm hinzufügen"
+
+Fragt Windows nach der Firewall, „Private Netzwerke" erlauben. Der Computer muss
+dabei an bleiben und das Fenster offen.
+
 ## Einstellungen – `config.json`
 
 | Feld | Bedeutung |

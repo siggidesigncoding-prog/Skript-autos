@@ -7,11 +7,13 @@
   python suche.py favoriten        gemerkte Autos anzeigen
   python suche.py entfernen 3      Favorit entfernen (Nr., ID oder URL)
   python suche.py web              Übersicht im Browser, mit ♥-Knopf zum Merken
+  python suche.py web --handy      dasselbe, aber vom Handy im WLAN aufrufbar
 """
 
 import argparse
 import json
 import re
+import socket
 import sys
 import webbrowser
 from http.server import BaseHTTPRequestHandler, HTTPServer
@@ -235,7 +237,24 @@ class WebHandler(BaseHTTPRequestHandler):
         pass
 
 
+def eigene_ip():
+    """IP-Adresse dieses Computers im WLAN (z.B. 192.168.178.23)."""
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        s.connect(("192.168.0.1", 80))  # es wird nichts gesendet, nur die Route bestimmt
+        return s.getsockname()[0]
+    except OSError:
+        return "127.0.0.1"
+    finally:
+        s.close()
+
+
 def befehl_web(args):
+    if args.handy:
+        adresse = f"http://{eigene_ip()}:{args.port}"
+        print(f"Auf dem Handy (gleiches WLAN) im Browser öffnen:  {adresse}")
+        print("Beenden mit Strg+C")
+        HTTPServer(("0.0.0.0", args.port), WebHandler).serve_forever()
     adresse = f"http://localhost:{args.port}"
     print(f"Übersicht läuft auf {adresse}  (beenden mit Strg+C)")
     webbrowser.open(adresse)
@@ -264,6 +283,7 @@ def main():
 
     w = unter.add_parser("web", help="Übersicht im Browser mit ♥-Knopf")
     w.add_argument("--port", type=int, default=8765)
+    w.add_argument("--handy", action="store_true", help="auch vom Handy im selben WLAN erreichbar")
 
     args = p.parse_args()
     befehle = {"merken": befehl_merken, "entfernen": befehl_entfernen,
