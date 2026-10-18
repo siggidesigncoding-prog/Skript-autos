@@ -37,7 +37,14 @@ python suche.py web                   # Übersicht im Browser, Autos per ♥ mer
 Nach jeder Suche liegt außerdem `bericht.html` im Ordner (ohne ♥-Funktion, dafür
 `python suche.py web` nehmen). Neue Anzeigen seit der letzten Suche sind mit 🆕 markiert.
 
-## Auf dem Handy ansehen
+## Handy-App
+
+Am einfachsten auf dem Handy: **https://claude.ai/artifact/PCDd8hzYTBwVZoKdxAbLRB**
+(Quelltext in `app/autosuche-app.html`). Die App öffnet die Suchen mit „billigste zuerst“
+und nur NRW, prüft eingefügte Anzeigentexte auf Reparaturkosten (gleiche Regeln wie das
+Skript, optional mit KI-Check) und führt eine Merkliste, die im Claude-Konto gespeichert wird.
+
+## Skript-Übersicht auf dem Handy ansehen
 
 Das Skript läuft auf deinem Computer, das Handy zeigt nur die Übersicht an:
 

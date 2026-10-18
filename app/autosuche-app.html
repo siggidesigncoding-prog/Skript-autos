@@ -1,0 +1,440 @@
+<title>Autosuche NRW</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Source+Sans+3:wght@400;600;700&display=swap">
+<style>
+/* Layout: one column phone app, model cards styled like German number plates, fixed bottom tab bar */
+:root{
+  --bg:#eef0f2; --flaeche:#ffffff; --text:#16191d; --grau:#5d6670; --linie:#d5dade;
+  --akzent:#1d4f9c; --akzent-text:#ffffff; --schild:#ffffff; --schild-rand:#16191d; --eu:#1d4f9c;
+  --gut:#17803d; --warn:#a15c00; --schlecht:#b42318; --gut-bg:#e5f4ea; --warn-bg:#fdf1de; --schlecht-bg:#fbe7e5;
+  --display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
+  --body:"Source Sans 3",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#121417; --flaeche:#1c2024; --text:#e8ebee; --grau:#9aa4ae; --linie:#2e343a;
+  --akzent:#6f9ee8; --akzent-text:#0d1420; --schild:#e8ebee; --schild-rand:#e8ebee; --eu:#2c5fb3;
+  --gut:#4cc275; --warn:#e3a33b; --schlecht:#f07167; --gut-bg:#16301f; --warn-bg:#352812; --schlecht-bg:#3a1a18; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121417; --flaeche:#1c2024; --text:#e8ebee; --grau:#9aa4ae; --linie:#2e343a;
+  --akzent:#6f9ee8; --akzent-text:#0d1420; --schild:#e8ebee; --schild-rand:#e8ebee; --eu:#2c5fb3;
+  --gut:#4cc275; --warn:#e3a33b; --schlecht:#f07167; --gut-bg:#16301f; --warn-bg:#352812; --schlecht-bg:#3a1a18; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font:16px/1.45 var(--body)}
+main{max-width:640px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px calc(96px + env(safe-area-inset-bottom,0px))}
+h1{font:700 34px/1 var(--display);letter-spacing:.01em;margin:0;text-wrap:balance}
+h2{font:600 22px/1.1 var(--display);margin:0;text-wrap:balance}
+.unter{color:var(--grau);font-size:14px;margin-top:6px}
+.abschnitt{display:flex;flex-direction:column;gap:14px}
+.kopf{display:flex;flex-direction:column;gap:2px;margin-bottom:18px}
+label,.label{font-size:13px;font-weight:600;color:var(--grau);letter-spacing:.04em;text-transform:uppercase}
+.preiswahl{display:flex;gap:6px;flex-wrap:wrap}
+.preiswahl button{flex:1;min-width:64px;font:600 17px var(--display);padding:9px 6px;border-radius:8px;border:1px solid var(--linie);background:var(--flaeche);color:var(--text);cursor:pointer}
+.preiswahl button[aria-pressed="true"]{background:var(--akzent);border-color:var(--akzent);color:var(--akzent-text)}
+.modell{background:var(--flaeche);border:1px solid var(--linie);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.modell-kopf{display:flex;gap:12px;align-items:center}
+.schild{display:inline-flex;align-items:stretch;border:2px solid var(--schild-rand);border-radius:5px;background:var(--schild);overflow:hidden;flex:none}
+.schild .eu{background:var(--eu);color:#fff;font:700 10px var(--body);width:16px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:2px}
+.schild b{font:700 24px/1 var(--display);color:#16191d;padding:5px 10px 4px;letter-spacing:.06em}
+.modell-kopf .info{min-width:0}
+.modell-kopf .name{font-weight:700}
+.klein{font-size:14px;color:var(--grau)}
+.links{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+a.knopf,button.knopf{display:flex;align-items:center;justify-content:center;gap:6px;text-align:center;text-decoration:none;font:600 15px var(--body);padding:11px 10px;border-radius:9px;border:1px solid var(--akzent);color:var(--akzent);background:transparent;cursor:pointer}
+a.knopf.voll,button.knopf.voll{background:var(--akzent);color:var(--akzent-text)}
+button.knopf:disabled{opacity:.5;cursor:default}
+.tipp{font-size:14px;color:var(--grau);background:var(--flaeche);border:1px dashed var(--linie);border-radius:10px;padding:10px 12px}
+form{display:flex;flex-direction:column;gap:12px}
+.feld{display:flex;flex-direction:column;gap:5px;min-width:0}
+.zeile{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+input,select,textarea{font:16px var(--body);color:var(--text);background:var(--flaeche);border:1px solid var(--linie);border-radius:8px;padding:10px;width:100%}
+textarea{min-height:130px;resize:vertical}
+input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible,a:focus-visible{outline:2px solid var(--akzent);outline-offset:2px}
+.urteil{border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:8px;border:1px solid var(--linie);background:var(--flaeche)}
+.urteil.gut{background:var(--gut-bg);border-color:transparent}
+.urteil.warn{background:var(--warn-bg);border-color:transparent}
+.urteil.schlecht{background:var(--schlecht-bg);border-color:transparent}
+.urteil .gross{font:700 26px/1.05 var(--display)}
+.gut .gross{color:var(--gut)}.warn .gross{color:var(--warn)}.schlecht .gross{color:var(--schlecht)}
+.summen{display:flex;gap:18px;flex-wrap:wrap;font-variant-numeric:tabular-nums}
+.summen div{display:flex;flex-direction:column}
+.summen b{font:700 20px var(--display)}
+ul.liste{margin:0;padding-left:18px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font-size:13px;font-weight:600;border-radius:99px;padding:2px 9px;background:var(--bg);color:var(--text);border:1px solid var(--linie)}
+.chip.gut{color:var(--gut)}.chip.warn{color:var(--warn)}.chip.schlecht{color:var(--schlecht)}
+.ki{border-top:1px solid var(--linie);padding-top:10px;display:flex;flex-direction:column;gap:6px}
+.fav{background:var(--flaeche);border:1px solid var(--linie);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.fav-kopf{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.fav-kopf .t{font-weight:700;min-width:0;overflow-wrap:anywhere}
+.fav-kopf .p{font:700 22px/1 var(--display);white-space:nowrap;text-align:right;font-variant-numeric:tabular-nums}
+.fav a{color:var(--akzent);overflow-wrap:anywhere}
+.fav-fuss{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.fav-fuss select{width:auto;padding:7px 8px;font-size:15px}
+.textknopf{background:none;border:0;color:var(--grau);font:600 14px var(--body);cursor:pointer;padding:6px 4px}
+.textknopf.rot{color:var(--schlecht)}
+.leer{text-align:center;color:var(--grau);padding:32px 12px;border:1px dashed var(--linie);border-radius:12px}
+.hinweis{font-size:13px;color:var(--grau)}
+nav{position:fixed;left:0;right:0;bottom:0;background:var(--flaeche);border-top:1px solid var(--linie);display:flex;justify-content:center;padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px);z-index:5}
+nav .innen{display:grid;grid-template-columns:repeat(3,1fr);width:100%;max-width:640px}
+nav button{background:none;border:0;padding:10px 4px 12px;font:600 17px var(--display);letter-spacing:.03em;color:var(--grau);cursor:pointer;border-top:3px solid transparent}
+nav button[aria-selected="true"]{color:var(--akzent);border-top-color:var(--akzent)}
+nav .zahl{font-family:var(--body);font-size:12px;background:var(--akzent);color:var(--akzent-text);border-radius:99px;padding:0 6px;margin-left:4px;vertical-align:2px}
+@media (prefers-reduced-motion:no-preference){.urteil,.fav{transition:background-color .2s}}
+</style>
+
+<main>
+  <header class="kopf">
+    <h1>Autosuche NRW</h1>
+    <div class="unter">W211 · E90 · E46 – billig, fahrbar, max. 2.000 € Reparatur</div>
+  </header>
+
+  <!-- ===== Suchen ===== -->
+  <section id="tab-suchen" class="abschnitt">
+    <div class="feld">
+      <span class="label">Höchstpreis</span>
+      <div class="preiswahl" id="preiswahl" role="group" aria-label="Höchstpreis"></div>
+    </div>
+    <div id="modelle" class="abschnitt"></div>
+    <div class="tipp">Die Links öffnen die Suche direkt mit „billigste zuerst“ und nur NRW. Gefällt dir ein Auto: Anzeigentext kopieren und unter <b>Prüfen</b> einfügen.</div>
+  </section>
+
+  <!-- ===== Prüfen ===== -->
+  <section id="tab-pruefen" class="abschnitt" hidden>
+    <h2>Anzeige prüfen</h2>
+    <form id="pruefform" autocomplete="off">
+      <div class="feld"><label for="f-link">Link zur Anzeige</label><input id="f-link" type="url" inputmode="url" placeholder="https://www.kleinanzeigen.de/s-anzeige/…"></div>
+      <div class="feld"><label for="f-titel">Titel</label><input id="f-titel" type="text" placeholder="z. B. BMW E90 320i TÜV neu"></div>
+      <div class="zeile">
+        <div class="feld"><label for="f-preis">Preis (€)</label><input id="f-preis" type="number" inputmode="numeric" min="0" placeholder="2900"></div>
+        <div class="feld"><label for="f-km">Kilometer</label><input id="f-km" type="number" inputmode="numeric" min="0" placeholder="189000"></div>
+      </div>
+      <div class="zeile">
+        <div class="feld"><label for="f-modell">Modell</label><select id="f-modell"><option>W211</option><option>E90</option><option>E46</option><option>anderes</option></select></div>
+        <div class="feld"><label for="f-notiz">Notiz</label><input id="f-notiz" type="text" placeholder="z. B. Sa anrufen"></div>
+      </div>
+      <div class="feld"><label for="f-text">Beschreibung aus der Anzeige</label><textarea id="f-text" placeholder="Text der Anzeige hier einfügen …"></textarea></div>
+    </form>
+    <div id="urteil" class="urteil" aria-live="polite"></div>
+    <div class="links">
+      <button class="knopf" id="ki-knopf" type="button" hidden>KI-Check</button>
+      <button class="knopf voll" id="merken-knopf" type="button">♥ Merken</button>
+    </div>
+    <div class="hinweis" id="merken-info"></div>
+  </section>
+
+  <!-- ===== Merkliste ===== -->
+  <section id="tab-merkliste" class="abschnitt" hidden>
+    <h2>Merkliste</h2>
+    <div class="hinweis" id="speicher-info">Lade Merkliste …</div>
+    <div id="favs" class="abschnitt"></div>
+  </section>
+</main>
+
+<nav><div class="innen" role="tablist">
+  <button role="tab" id="nav-suchen" aria-selected="true" data-tab="suchen">Suchen</button>
+  <button role="tab" id="nav-pruefen" aria-selected="false" data-tab="pruefen">Prüfen</button>
+  <button role="tab" id="nav-merkliste" aria-selected="false" data-tab="merkliste">Merkliste<span class="zahl" id="fav-zahl" hidden>0</span></button>
+</div></nav>
+
+<script>
+"use strict";
+// ---------------------------------------------------------------- Modelle --
+const MODELLE = {
+  W211:{name:"Mercedes E-Klasse W211",jahre:[2002,2009],ka:"mercedes-w211",as:"mercedes-benz/e-klasse-(alle)",asExtra:"",
+        schwach:"SBC-Bremse (bis ~2006), Airmatic, Rost an Türen/Radläufen, Injektoren beim CDI"},
+  E90:{name:"BMW 3er E90 Limousine",jahre:[2005,2012],ka:"bmw-e90",as:"bmw/3er-(alle)",asExtra:"&body=6",
+        schwach:"Steuerkette beim N47-Diesel (318d/320d bis ~2010), Ölverlust Ventildeckel, el. Wasserpumpe"},
+  E46:{name:"BMW 3er E46",jahre:[1998,2006],ka:"bmw-e46",as:"bmw/3er-(alle)",asExtra:"",
+        schwach:"Rost (Schweller, Wagenheberaufnahmen), Vanos, Kühlsystem, Ölverlust"},
+};
+const PREISE=[2000,3000,4000,5000];
+const PREIS_MIN=500;
+const MAX_REPARATUR=2000;
+
+function kaLink(m,max){return `https://www.kleinanzeigen.de/s-autos/nordrhein-westfalen/sortierung:preis/preis:${PREIS_MIN}:${max}/${m.ka}/k0c216l928`;}
+function asLink(m,max){return `https://www.autoscout24.de/lst/${m.as}?atype=C&cy=D&damaged_listing=exclude&fregfrom=${m.jahre[0]}&fregto=${m.jahre[1]}&pricefrom=${PREIS_MIN}&priceto=${max}&zip=58239&zipr=150&sort=price&desc=0${m.asExtra}`;}
+
+// --------------------------------------------- Bewertung (wie im Skript) --
+const AUSSCHLUSS=[
+  [/motor\s?schaden|motor (ist )?(defekt|kaputt)|kolbenfresser|pleuel/,"Motorschaden"],
+  [/getriebe\s?schaden|getriebe (ist )?(defekt|kaputt)|getriebe rutscht/,"Getriebeschaden"],
+  [/nicht fahrbereit|nicht fahrbar|nicht fahrtüchtig|springt nicht an|läuft nicht\b(?! unrund)/,"nicht fahrbereit"],
+  [/\bbastler|bastlerfahrzeug|teileträger|ausschlacht/,"Bastlerfahrzeug"],
+  [/totalschaden|wasserschaden|brandschaden|hagelschaden/,"schwerer Schaden"],
+  [/rahmen\s?schaden|achsschaden|unfallwagen|unfall ?fahrzeug|unfallauto|unfallschaden/,"Unfallwagen"],
+  [/nur (für )?export|nur gewerbe|export only/,"nur Export/Gewerbe"],
+  [/kopfdichtung|wasser im öl|öl im wasser/,"Zylinderkopfdichtung"],
+  [/steuerkette (ist )?(gerissen|übersprungen)|kette gerissen|zahnriemen gerissen/,"Steuerkette/Zahnriemen gerissen"],
+];
+const MAENGEL=[
+  [/ohne tüv|kein tüv|tüv abgelaufen|tüv fällig|ohne hu|hu abgelaufen|tüv (ist )?abgelaufen|tüv überzogen/,500,"TÜV fällig"],
+  [/rost|durchgerostet/,600,"Rost"],
+  [/kupplung (rutscht|defekt|fällig|kommt (hoch|spät)|muss|schleift)|kupplung bald/,800,"Kupplung"],
+  [/steuerkette (rasselt|defekt|fällig|muss|laut|gelängt)|kettenrasseln|kette rasselt/,1500,"Steuerkette"],
+  [/injektor(en)? (defekt|undicht|fällig|muss)|einspritzdüse(n)? defekt/,900,"Injektoren"],
+  [/turbo(lader)? (defekt|pfeift|kaputt|fällig)|ladedruck/,1200,"Turbolader"],
+  [/(dpf|partikelfilter) (defekt|voll|zu|fällig)/,800,"Partikelfilter"],
+  [/agr(-ventil)? (defekt|fällig)/,400,"AGR-Ventil"],
+  [/\bsbc\b/,1000,"SBC-Bremse"],
+  [/(airmatic|luftfeder\w*) (defekt|undicht|senkt|sackt|fällig)|airmatic fehler/,700,"Luftfederung"],
+  [/vanos (defekt|fällig|rasselt)|vanosfehler/,600,"Vanos"],
+  [/klima(anlage)? (defekt|geht nicht|kühlt nicht|ohne funktion|muss)/,400,"Klimaanlage"],
+  [/ölverlust|verliert öl|öl ?undicht|ölfeucht|schwitzt öl/,300,"Ölverlust"],
+  [/wasserpumpe (defekt|undicht|fällig)|kühlwasserverlust|verliert wasser|überhitzt/,500,"Kühlsystem"],
+  [/bremsen (sind )?(fällig|runter|verschlissen|machen)|bremse fällig/,300,"Bremsen"],
+  [/(querlenker|fahrwerk|stoßdämpfer|koppelstange|traggelenk)\w* (defekt|fällig|ausgeschlagen|poltert|klappert)|poltert|klappert/,400,"Fahrwerk"],
+  [/zündspule (defekt|fällig)|läuft unrund|ruckelt|zündaussetzer/,250,"Zündung / unrunder Lauf"],
+  [/motorkontrollleuchte|mkl leuchtet|motorleuchte|fehler im speicher|fehlerspeicher/,300,"Motorleuchte"],
+  [/(auspuff|endtopf|mittelschalldämpfer|krümmer) (defekt|undicht|laut|durch)/,250,"Auspuff"],
+  [/(lichtmaschine|anlasser) (defekt|fällig)|batterie (leer|defekt)/,300,"Elektrik / Starter"],
+  [/automatik(getriebe)? (ruckelt|schlägt|defekt)|getriebe ruckelt|schaltruck|schaltet hart/,1500,"Automatikgetriebe"],
+  [/delle|kratzer|beule|lackschaden|gebrauchsspuren/,0,"Optische Mängel"],
+];
+const GUT=[
+  [/tüv neu|hu neu|neuer tüv|tüv frisch|frischer tüv/,"TÜV neu"],
+  [/fahrbereit|fährt einwandfrei|fährt super|fährt gut|läuft einwandfrei/,"fährt gut"],
+  [/scheckheft|checkheft|serviceheft/,"Scheckheft"],
+  [/inspektion (neu|gemacht)|ölwechsel neu|service neu/,"frischer Service"],
+  [/steuerkette (neu|getauscht|gewechselt)/,"Steuerkette neu"],
+  [/kupplung (neu|getauscht|gewechselt)/,"Kupplung neu"],
+];
+const VERNEINT=/\b(kein|keine|keinen|ohne)\s+(?!tüv|hu\b)[\wäöüß-]+|\S*(rost|unfall)frei\S*|nicht (rostig|verunfallt)/g;
+const REPARIERT=/(neu|erneuert|getauscht|gewechselt|gemacht|repariert|behoben|ersetzt|frisch)/;
+
+function huMonate(t){
+  const m=t.match(/(?:tüv|hu)[^\d]{0,15}(\d{1,2})[./](\d{2,4})/);
+  if(!m) return null;
+  let mon=+m[1], j=+m[2]; if(j<100) j+=2000; if(mon<1||mon>12) return null;
+  const h=new Date(); return (j-h.getFullYear())*12+(mon-(h.getMonth()+1));
+}
+function bewerte(text,km){
+  const t=(text||"").toLowerCase().replace(VERNEINT," ");
+  const e={fahrbar:true,kosten:0,gruende:[],plus:[],ausschluss:null};
+  for(const [re,g] of AUSSCHLUSS){ if(re.test(t)){e.fahrbar=false;e.ausschluss=g;return e;} }
+  for(const [re,k,n] of MAENGEL){
+    const m=re.exec(t); if(!m) continue;
+    const um=t.slice(Math.max(0,m.index-25),m.index+m[0].length+25);
+    if(REPARIERT.test(um)&&!/muss|fällig|defekt|bald/.test(um)) continue;
+    e.kosten+=k; e.gruende.push({n,k});
+  }
+  const hu=huMonate(t);
+  if(hu!==null&&hu<3&&!e.gruende.some(g=>g.n==="TÜV fällig")){e.kosten+=500;e.gruende.push({n:"TÜV läuft bald ab",k:500});}
+  if(km&&km>300000){e.kosten+=300;e.gruende.push({n:"über 300.000 km",k:300});}
+  for(const [re,n] of GUT) if(re.test(t)) e.plus.push(n);
+  return e;
+}
+
+// ---------------------------------------------------------------- Helfer --
+const $=id=>document.getElementById(id);
+const euro=x=>(x||x===0)?Number(x).toLocaleString("de-DE")+" €":"? €";
+function el(tag,attrs={},...kinder){
+  const n=document.createElement(tag);
+  for(const [k,v] of Object.entries(attrs)){ if(k==="text") n.textContent=v; else if(k.startsWith("on")) n.addEventListener(k.slice(2),v); else n.setAttribute(k,v); }
+  for(const k of kinder) if(k!=null) n.append(k);
+  return n;
+}
+function lies(k,s){try{const v=localStorage.getItem(k);return v==null?s:JSON.parse(v);}catch{return s;}}
+function schreib(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch{}}
+
+// ------------------------------------------------------------------ Tabs --
+function zeigeTab(name){
+  for(const t of ["suchen","pruefen","merkliste"]){
+    $("tab-"+t).hidden=t!==name; $("nav-"+t).setAttribute("aria-selected",String(t===name));
+  }
+  schreib("tab",name); window.scrollTo(0,0);
+}
+document.querySelectorAll("nav button").forEach(b=>b.addEventListener("click",()=>zeigeTab(b.dataset.tab)));
+
+// --------------------------------------------------------------- Suchen --
+let maxPreis=lies("maxPreis",5000);
+function zeichneSuche(){
+  const pw=$("preiswahl"); pw.replaceChildren();
+  for(const p of PREISE) pw.append(el("button",{type:"button","aria-pressed":String(p===maxPreis),text:(p/1000)+".000 €",onclick:()=>{maxPreis=p;schreib("maxPreis",p);zeichneSuche();}}));
+  const box=$("modelle"); box.replaceChildren();
+  for(const [key,m] of Object.entries(MODELLE)){
+    box.append(el("article",{class:"modell"},
+      el("div",{class:"modell-kopf"},
+        el("span",{class:"schild","aria-hidden":"true"},el("span",{class:"eu",text:"D"}),el("b",{text:key})),
+        el("div",{class:"info"},el("div",{class:"name",text:m.name}),el("div",{class:"klein",text:`Baujahre ${m.jahre[0]}–${m.jahre[1]} · bis ${euro(maxPreis)}`}))),
+      el("div",{class:"klein",text:"Schwachstellen: "+m.schwach}),
+      el("div",{class:"links"},
+        el("a",{class:"knopf voll",href:kaLink(m,maxPreis),target:"_blank",rel:"noopener",text:"Kleinanzeigen"}),
+        el("a",{class:"knopf",href:asLink(m,maxPreis),target:"_blank",rel:"noopener",text:"AutoScout24"}))
+    ));
+  }
+}
+
+// --------------------------------------------------------------- Prüfen --
+const FELDER=["f-link","f-titel","f-preis","f-km","f-modell","f-notiz","f-text"];
+let letzteBewertung=null, kiErgebnis=null;
+function formDaten(){
+  return {url:$("f-link").value.trim(),titel:$("f-titel").value.trim(),preis:+$("f-preis").value||null,
+          km:+$("f-km").value||null,modell:$("f-modell").value,notiz:$("f-notiz").value.trim(),text:$("f-text").value};
+}
+function zeichneUrteil(){
+  const d=formDaten(); const box=$("urteil"); box.replaceChildren();
+  schreib("entwurf",d);
+  if(!d.titel&&!d.text.trim()){
+    box.className="urteil";
+    box.append(el("div",{class:"klein",text:"Titel und Beschreibung einfügen – die Bewertung erscheint sofort hier."}));
+    letzteBewertung=null; return;
+  }
+  const b=bewerte(d.titel+" "+d.text,d.km); letzteBewertung=b;
+  const zuTeuer=b.kosten>MAX_REPARATUR;
+  const art=!b.fahrbar||zuTeuer?"schlecht":b.kosten>=1000?"warn":"gut";
+  box.className="urteil "+art;
+  box.append(el("div",{class:"gross",text:!b.fahrbar?"Finger weg: "+b.ausschluss:zuTeuer?"Zu viel Reparatur":b.kosten>=1000?"Fahrbar, aber Arbeit":"Sieht gut aus"}));
+  if(b.fahrbar){
+    box.append(el("div",{class:"summen"},
+      el("div",{},el("span",{class:"klein",text:"Preis"}),el("b",{text:euro(d.preis)})),
+      el("div",{},el("span",{class:"klein",text:"Reparatur ca."}),el("b",{text:euro(b.kosten)})),
+      el("div",{},el("span",{class:"klein",text:"Gesamt ca."}),el("b",{text:d.preis?euro(d.preis+b.kosten):"–"}))));
+    if(b.gruende.length){ const ul=el("ul",{class:"liste"}); for(const g of b.gruende) ul.append(el("li",{text:g.k?`${g.n} (~${euro(g.k)})`:`${g.n} (nicht eingerechnet)`})); box.append(ul); }
+    else box.append(el("div",{class:"klein",text:"Im Text keine Mängel gefunden. Trotzdem Probefahrt machen."}));
+  }
+  if(b.plus.length){ const c=el("div",{class:"chips"}); for(const p of b.plus) c.append(el("span",{class:"chip gut",text:"✔ "+p})); box.append(c); }
+  if(kiErgebnis) box.append(kiBox(kiErgebnis));
+}
+FELDER.forEach(id=>$(id).addEventListener("input",()=>{kiErgebnis=null;zeichneUrteil();}));
+$("pruefform").addEventListener("submit",e=>e.preventDefault());
+
+function kiBox(k){
+  const box=el("div",{class:"ki"},el("div",{class:"label",text:"KI-Einschätzung"}));
+  if(k.fehler){box.append(el("div",{class:"klein",text:k.fehler}));return box;}
+  box.append(el("div",{text:`${k.fahrbar?"Fahrbar":"Eher nicht fahrbar"} · Reparatur ca. ${euro(k.kosten_euro)}`}));
+  if(k.fazit) box.append(el("div",{class:"klein",text:k.fazit}));
+  if(k.fragen_an_verkaeufer?.length){
+    box.append(el("div",{class:"label",text:"Frag den Verkäufer"}));
+    const ul=el("ul",{class:"liste"}); for(const f of k.fragen_an_verkaeufer.slice(0,5)) ul.append(el("li",{text:String(f)})); box.append(ul);
+  }
+  return box;
+}
+
+let sample=null;
+async function kiCheck(){
+  const d=formDaten(); if(!sample||(!d.text.trim()&&!d.titel)) return;
+  const knopf=$("ki-knopf"); knopf.disabled=true; knopf.textContent="KI prüft …";
+  const m=MODELLE[d.modell];
+  const auftrag=`Du bist ein erfahrener Kfz-Meister in NRW. Bewerte diese Gebrauchtwagen-Anzeige (${d.modell}${m?" – "+m.name:""}).
+Schätze realistisch, ob das Auto fahrbar ist und was eine freie Werkstatt mit Online-Teilen grob kosten würde, um es verkehrssicher zu machen (inkl. TÜV, falls nötig).
+${m?"Typische Schwachstellen dieses Modells: "+m.schwach:""}
+Titel: ${d.titel||"-"}
+Preis: ${d.preis||"?"} €  Kilometer: ${d.km||"?"}
+Beschreibung:
+${d.text.slice(0,4000)}
+
+Antworte NUR mit JSON in dieser Form:
+{"fahrbar": true, "kosten_euro": 800, "fazit": "ein bis zwei kurze Sätze auf Deutsch", "fragen_an_verkaeufer": ["kurze Frage", "..."]}`;
+  try{
+    kiErgebnis=await sample.json(auftrag,{modelTier:"default"});
+  }catch(e){
+    kiErgebnis={fehler:e?.code==="rate_limited"?"Zu viele Anfragen – bitte kurz warten.":e?.code==="not_granted"?"KI-Check wurde nicht erlaubt.":"KI-Check hat nicht geklappt."};
+    if(e?.code==="not_granted") knopf.hidden=true;
+  }
+  knopf.disabled=false; knopf.textContent="KI-Check";
+  zeichneUrteil();
+}
+$("ki-knopf").addEventListener("click",kiCheck);
+
+// ------------------------------------------------------------ Merkliste --
+let favs=[];                 // {id, ...}
+let speicher=null;           // {art:"db"|"lokal", ...}
+const STATUS=["neu","angeschrieben","Probefahrt","abgesagt","gekauft"];
+
+function favFarbe(f){return !f.fahrbar||f.kosten>MAX_REPARATUR?"schlecht":f.kosten>=1000?"warn":"gut";}
+function zeichneFavs(){
+  const box=$("favs"); box.replaceChildren();
+  $("fav-zahl").hidden=!favs.length; $("fav-zahl").textContent=favs.length;
+  if(!favs.length){
+    box.append(el("div",{class:"leer"},el("div",{text:"Noch nichts gemerkt."}),el("div",{class:"klein",text:"Unter „Prüfen“ eine Anzeige einfügen und auf ♥ Merken tippen."})));
+    return;
+  }
+  const sortiert=[...favs].sort((a,b)=>(a.status==="abgesagt")-(b.status==="abgesagt")||((a.preis||0)+(a.kosten||0))-((b.preis||0)+(b.kosten||0)));
+  for(const f of sortiert){
+    const sel=el("select",{id:"status-"+f.id,"aria-label":"Status"});
+    for(const s of STATUS) sel.append(el("option",{value:s,text:s}));
+    sel.value=f.status||"neu"; sel.addEventListener("change",()=>aendere(f.id,{status:sel.value}));
+    const loeschen=el("button",{class:"textknopf",type:"button",text:"Entfernen"});
+    loeschen.addEventListener("click",()=>{
+      if(loeschen.dataset.sicher){entferne(f.id);return;}
+      loeschen.dataset.sicher="1"; loeschen.textContent="Wirklich entfernen?"; loeschen.classList.add("rot");
+      setTimeout(()=>{delete loeschen.dataset.sicher;loeschen.textContent="Entfernen";loeschen.classList.remove("rot");},4000);
+    });
+    box.append(el("article",{class:"fav"},
+      el("div",{class:"fav-kopf"},
+        el("div",{class:"t",text:(f.modell&&f.modell!=="anderes"?f.modell+" · ":"")+(f.titel||"Ohne Titel")}),
+        el("div",{class:"p",text:euro(f.preis)})),
+      el("div",{class:"chips"},
+        el("span",{class:"chip "+favFarbe(f),text:f.fahrbar?"Reparatur ~"+euro(f.kosten):"nicht fahrbar"}),
+        f.preis?el("span",{class:"chip",text:"gesamt ~"+euro(f.preis+(f.kosten||0))}):null,
+        f.km?el("span",{class:"chip",text:Number(f.km).toLocaleString("de-DE")+" km"}):null),
+      f.gruende?.length?el("div",{class:"klein",text:f.gruende.join(", ")}):null,
+      f.notiz?el("div",{class:"klein",text:"Notiz: "+f.notiz}):null,
+      f.url?el("a",{href:f.url,target:"_blank",rel:"noopener",text:"Anzeige öffnen"}):null,
+      el("div",{class:"fav-fuss"},sel,loeschen)
+    ));
+  }
+}
+
+async function merken(){
+  const d=formDaten(); const info=$("merken-info");
+  if(!d.titel&&!d.url){info.textContent="Bitte mindestens Titel oder Link eintragen.";return;}
+  const b=letzteBewertung||bewerte(d.titel+" "+d.text,d.km);
+  const id=(d.url||d.titel).replace(/[^a-z0-9]/gi,"").slice(-40)||String(Date.now());
+  const eintrag={titel:d.titel,url:d.url,preis:d.preis,km:d.km,modell:d.modell,notiz:d.notiz,
+    fahrbar:b.fahrbar,kosten:b.kosten,gruende:b.fahrbar?b.gruende.map(g=>g.n):[b.ausschluss],
+    ki:kiErgebnis&&!kiErgebnis.fehler?{kosten:kiErgebnis.kosten_euro,fazit:kiErgebnis.fazit||""}:null,
+    status:"neu",gemerkt:new Date().toISOString()};
+  try{
+    await speichere(id,eintrag);
+    info.textContent="♥ Gemerkt. Formular ist wieder leer für die nächste Anzeige.";
+    for(const f of FELDER) if(f!=="f-modell") $(f).value="";
+    kiErgebnis=null; zeichneUrteil();
+  }catch{ info.textContent="Speichern hat nicht geklappt. Bitte nochmal versuchen."; }
+}
+$("merken-knopf").addEventListener("click",merken);
+
+// Speicher: im Claude-Konto (geräteübergreifend) oder notfalls nur im Browser
+async function speichere(id,daten){
+  if(speicher?.art==="db"){ await speicher.coll.doc(id).set(daten); return; }
+  const i=favs.findIndex(f=>f.id===id); if(i>=0) favs[i]={id,...daten}; else favs.push({id,...daten});
+  schreib("favs",favs); zeichneFavs();
+}
+async function aendere(id,teil){
+  if(speicher?.art==="db"){ try{await speicher.coll.doc(id).update(teil);}catch{} return; }
+  favs=favs.map(f=>f.id===id?{...f,...teil}:f); schreib("favs",favs); zeichneFavs();
+}
+async function entferne(id){
+  if(speicher?.art==="db"){ try{await speicher.coll.doc(id).delete();}catch{} return; }
+  favs=favs.filter(f=>f.id!==id); schreib("favs",favs); zeichneFavs();
+}
+function lokalerSpeicher(grund){
+  speicher={art:"lokal"}; favs=lies("favs",[]);
+  $("speicher-info").textContent=grund+" Die Merkliste wird nur in diesem Browser gespeichert.";
+  zeichneFavs();
+}
+
+async function start(){
+  zeichneSuche();
+  const e=lies("entwurf",null);
+  if(e){ $("f-link").value=e.url||""; $("f-titel").value=e.titel||""; $("f-preis").value=e.preis||""; $("f-km").value=e.km||"";
+         $("f-modell").value=e.modell||"W211"; $("f-notiz").value=e.notiz||""; $("f-text").value=e.text||""; }
+  zeichneUrteil(); zeichneFavs();
+  zeigeTab(lies("tab","suchen"));
+
+  if(!window.claude?.use){ lokalerSpeicher("Nicht in Claude geöffnet."); return; }
+  claude.use("sample").then(s=>{ if(s){sample=s;$("ki-knopf").hidden=false;} }).catch(()=>{});
+  try{
+    const [db,user]=await Promise.all([claude.use("db"),claude.use("user")]);
+    const uid=user?await user.id():null;
+    if(!db||!uid){ lokalerSpeicher("Nicht angemeldet."); return; }
+    const coll=db.collection("data/users/"+uid);
+    speicher={art:"db",coll};
+    $("speicher-info").textContent="Gespeichert in deinem Claude-Konto – auf Handy und PC gleich.";
+    coll.onSnapshot(snap=>{ favs=snap.docs.map(d=>({id:d.id,...d.data()})); zeichneFavs(); },
+      ()=>{ $("speicher-info").textContent="Merkliste konnte nicht geladen werden. Seite neu laden."; });
+  }catch{ lokalerSpeicher("Konto-Speicher nicht verfügbar."); }
+}
+start();
+</script>
